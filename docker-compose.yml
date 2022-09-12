@@ -1,0 +1,75 @@
+services:
+
+  back:
+    build: back-java/
+    ports:
+      - 8080:8080
+    networks:
+      my-net:
+        aliases:
+          - back
+    depends_on:
+      - db
+
+  ui:
+    build: ui-vue/
+    ports:
+      - 3000:80
+    networks:
+      my-net:
+        aliases:
+          - ui
+    depends_on:
+      - back
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=citylist
+    logging:
+      options:
+        max-size: 10m
+        max-file: 3
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      interval: 10s
+      retries: 10
+
+    ports:
+      - 5432:5432
+    networks:
+      my-net:
+        aliases:
+          - db
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+  liquibase:
+    image: liquibase/liquibase
+    volumes:
+      - ./back-java/data/liquibase:/liquibase/changelog
+    command: liquibase --log-level ALL --url="jdbc:postgresql://db:5432/citylist" --changeLogFile=./changelog/changelog.xml --username=postgres --password=postgres update
+#    command: liquibase --url="jdbc:postgresql://db:5432/citylist" --changeLogFile=./changelog/changelog.xml --username=postgres --password=postgres update
+    networks:
+      my-net:
+    depends_on:
+      db:
+        condition: service_healthy
+
+#  pgadmin:
+#    image: dpage/pgadmin4
+#    ports:
+#      - 9999:80
+#    networks:
+#      my-net:
+#        aliases:
+#          - pgadmin
+#    environment:
+#      - PGADMIN_DEFAULT_EMAIL=postgres@gmail.com
+#      - PGADMIN_DEFAULT_PASSWORD=postgres
+
+networks:
+  my-net:

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd
+      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.5.xsd">
+
+    <changeSet author="sam" id="createTableCity">
+        <createTable tableName="city">
+            <column autoIncrement="true" name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="city_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="photo" type="VARCHAR(2048)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="sam" id="loadCities">
+        <loadData encoding="UTF-8"
+                  file="./changelog/cities.csv"
+                  schemaName="public"
+                  separator=","
+                  tableName="city"
+                  usePreparedStatements="true">
+            <column header="id"
+                    type="NUMERIC"/>
+            <column header="name"
+                    type="STRING"/>
+            <column header="photo"
+                    type="STRING"/>
+        </loadData>
+    </changeSet>
+
+</databaseChangeLog>

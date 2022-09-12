@@ -1,0 +1,28 @@
+Back
+
+docker build -f Dockerfile -t nepomnyaschih/solbeg-citylist-back .
+docker push nepomnyaschih/solbeg-citylist-back
+
+
+
+UI
+docker build -f Dockerfile -t nepomnyaschih/solbeg-citylist-ui .
+docker push nepomnyaschih/solbeg-citylist-ui
+
+DB
+
+compose
+
+
+docker compose up -d
+
+
+docker run --rm -v ./back-java/data/liquibase/changelog:/liquibase/changelog liquibase/liquibase \
+--url=jdbc:postgresql://db:5432/citylist?currentSchema=public \
+--changelog-file=changelog.xml --username=admin \
+--password=admin update
+
+
+pg_isready -d citylist -U postgres
+
+psql -lqt | cut -d \| -f 1 | grep -qw citylist
