@@ -29,15 +29,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=citylist
-    logging:
-      options:
-        max-size: 10m
-        max-file: 3
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       interval: 10s
       retries: 10
-
     ports:
       - 5432:5432
     networks:
@@ -50,26 +45,25 @@ services:
   liquibase:
     image: liquibase/liquibase
     volumes:
-      - ./back-java/data/liquibase:/liquibase/changelog
-    command: liquibase --log-level ALL --url="jdbc:postgresql://db:5432/citylist" --changeLogFile=./changelog/changelog.xml --username=postgres --password=postgres update
-#    command: liquibase --url="jdbc:postgresql://db:5432/citylist" --changeLogFile=./changelog/changelog.xml --username=postgres --password=postgres update
+      - ./data/liquibase:/liquibase/changelog
+    command: liquibase --url="jdbc:postgresql://db:5432/citylist" --changeLogFile=./changelog/changelog.xml --username=postgres --password=postgres update
     networks:
       my-net:
     depends_on:
       db:
         condition: service_healthy
 
-#  pgadmin:
-#    image: dpage/pgadmin4
-#    ports:
-#      - 9999:80
-#    networks:
-#      my-net:
-#        aliases:
-#          - pgadmin
-#    environment:
-#      - PGADMIN_DEFAULT_EMAIL=postgres@gmail.com
-#      - PGADMIN_DEFAULT_PASSWORD=postgres
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 9999:80
+    networks:
+      my-net:
+        aliases:
+          - pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=postgres@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=postgres
 
 networks:
   my-net:
