@@ -1,6 +1,7 @@
 import axios from "axios";
+const baseURl = import.meta.env.VITE_BACK_BASE_URL;
 
-const api = axios.create({ baseURL: "http://localhost:8080/api" });
+const api = axios.create({ baseURL: baseURl+"/api" });
 api.defaults.timeout = 500;
 
 api.interceptors.request.use(
