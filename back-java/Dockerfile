@@ -8,4 +8,4 @@ RUN mvn -f /home/app/pom.xml clean package
 FROM openjdk:17-alpine as production-stage
 COPY --from=build-stage /home/app/target/citylist-0.0.1-SNAPSHOT.jar citylist.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","citylist.jar"]
+ENTRYPOINT ["java","-jar", "citylist.jar","--spring.profiles.default=prod"]
