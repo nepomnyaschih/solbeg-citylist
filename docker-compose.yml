@@ -20,7 +20,8 @@ services:
         aliases:
           - ui
     depends_on:
-      - back
+      db:
+        condition: service_healthy
 
   db:
     image: postgres
