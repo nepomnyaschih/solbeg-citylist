@@ -1,10 +1,10 @@
 package com.solbeg.citylist.service.login;
 
-import com.solbeg.citylist.request.LoginRequest;
-import com.solbeg.citylist.response.LoginResponse;
+import com.solbeg.citylist.model.request.LoginRequest;
+import com.solbeg.citylist.model.response.LoginResponse;
 import com.solbeg.citylist.security.SecureUser;
 import com.solbeg.citylist.utils.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,12 +12,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class LoginServiceImpl implements LoginService {
     private final AuthenticationManager authenticationManager;
-
-    public LoginServiceImpl(@Autowired AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
 
     @Override
     public LoginResponse doLogin(LoginRequest loginRequest) {

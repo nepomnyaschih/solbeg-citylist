@@ -3,9 +3,9 @@ package com.solbeg.citylist.service.register;
 import com.solbeg.citylist.dto.UserDTO;
 import com.solbeg.citylist.dto.UserRoleDTO;
 import com.solbeg.citylist.repository.RegisterRepository;
-import com.solbeg.citylist.request.RegisterRequest;
-import com.solbeg.citylist.response.RegisterResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.solbeg.citylist.model.request.RegisterRequest;
+import com.solbeg.citylist.model.response.RegisterResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,14 +13,10 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class RegisterServiceImpl implements RegisterService {
     private final PasswordEncoder passwordEncoder;
     private final RegisterRepository registerRepository;
-
-    public RegisterServiceImpl(@Autowired PasswordEncoder passwordEncoder, @Autowired RegisterRepository registerRepository) {
-        this.passwordEncoder = passwordEncoder;
-        this.registerRepository = registerRepository;
-    }
 
     @Transactional
     @Override
@@ -34,7 +30,7 @@ public class RegisterServiceImpl implements RegisterService {
         registerRepository.save(newUser);
         RegisterResponse registerResponse = new RegisterResponse();
         registerResponse.setRegistered(true);
-        registerResponse.setMesssage("User was saved");
+        registerResponse.setMessage("User was saved");
         return registerResponse;
     }
 

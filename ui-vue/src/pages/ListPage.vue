@@ -1,6 +1,9 @@
 <script setup>
+    import TheList from '../components/list/TheList.vue'
 </script>
         
 <template>
-    LIST HERE
+    <main>
+        <TheList />
+    </main>
 </template>

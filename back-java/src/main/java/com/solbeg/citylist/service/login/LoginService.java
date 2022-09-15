@@ -1,7 +1,7 @@
 package com.solbeg.citylist.service.login;
 
-import com.solbeg.citylist.request.LoginRequest;
-import com.solbeg.citylist.response.LoginResponse;
+import com.solbeg.citylist.model.request.LoginRequest;
+import com.solbeg.citylist.model.response.LoginResponse;
 
 public interface LoginService {
 
