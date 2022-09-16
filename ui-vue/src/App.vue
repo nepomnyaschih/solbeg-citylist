@@ -14,28 +14,26 @@ function logout() {
   $store.dispatch("loginModule/doLogout");
   router.push({ name: "Login" });
 }
-
 </script>
 
 <template>
-
-  <nav class="navbar navbar-dark bg-primary vh-5">
-    <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">Solbeg cities list application</span>
-      <form class="d-flex" role="search">
-        <button v-if="isLoggedIn()" v-on:click="logout" class="btn btn-danger" type="submit">Logout</button>
-      </form>
-    </div>
-  </nav>
-  <!-- 
-          <RouterLink to="/">Cities List</RouterLink>
-          <RouterLink to="/login">Login</RouterLink> -->
-
-  <RouterView />
+  <q-layout view="hHh LpR fFf">
+    <q-header elevated class="bg-primary text-white">
+      <q-toolbar>
+        <q-toolbar-title>
+          <q-avatar>
+            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
+          </q-avatar>
+          Solbeg cities list application
+        </q-toolbar-title>
+        <q-btn v-if="isLoggedIn()" @click="logout" color="deep-orange" glossy label="Logout" />
+      </q-toolbar>
+    </q-header>
+    <q-page-container>
+      <RouterView />
+    </q-page-container>
+  </q-layout>
 </template>
 
 <style scoped>
-.vh-5 {
-  height: 5vh !important;
-}
 </style>
