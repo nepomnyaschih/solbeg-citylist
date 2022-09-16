@@ -16,7 +16,7 @@ public class CityDTO {
     @Column
     private String name;
 
-    @Column
+    @Column(length = 2048)
     private String photo;
 
 }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { CitiesService, CitiesRequest } from '../../services/cities';
 
@@ -9,7 +9,7 @@ const cities = ref([]);
 const searchText = ref("");
 const pagination = ref({
     page: 1,
-    rowsPerPage: 6,
+    rowsPerPage: 3,
     rowsNumber: 0
 });
 const columns = [
@@ -19,23 +19,26 @@ const columns = [
 
 const $store = useStore();
 
+var canEdit = false;
+
+if ($store.getters["loginModule/getRoles"].includes("ROLE_ALLOW_EDIT")) canEdit = true;
+
 async function getCities() {
 
     const searchParams = {
         searchText: searchText.value,
-        page: pagination.value.page-1,
+        page: pagination.value.page - 1,
         size: pagination.value.rowsPerPage
     };
 
     const req = new CitiesRequest($store.getters["loginModule/getJwt"], searchParams);
     const response = await citiesServise.getCities(req);
+
     cities.value = response.data.cities;
-
-
     pagination.value.rowsNumber = response.data.totalCount;
 }
 
-function onSearch(){
+function onSearch() {
     pagination.value.page = 1;
     getCities();
 }
@@ -49,17 +52,24 @@ function onPagination(props) {
     }
 }
 
-getCities();
+onMounted(() => {
+    getCities();
+})
+
+async function update(id, name, photo) {
+    const response = await citiesServise.updateCity($store.getters["loginModule/getJwt"], id, { name, photo });
+}
+
 </script>
         
 <template>
-
     <q-page class="row justify-center">
 
         <div class="column full-width">
             <div class="row q-pa-md">
                 <q-table class="full-width" grid title="Cities" :rows="cities" :columns="columns" row-key="name"
-                    @request="onPagination" v-model:pagination="pagination" :rows-per-page-options="[3,6,12,24,48]" hide-header>
+                    @request="onPagination" v-model:pagination="pagination" :rows-per-page-options="[3,6,12,24,48]"
+                    hide-header>
                     <template v-slot:top-right>
                         <q-input borderless dense debounce="500" v-model="searchText" placeholder="Search"
                             @update:modelValue="onSearch">
@@ -73,11 +83,30 @@ getCities();
                             <q-card>
                                 <q-card-section class="text-center">
                                     <strong>{{ props.row.name }}</strong>
+                                    <q-icon name="edit" v-if="canEdit" />
+                                    <q-popup-edit v-model.number="props.row.name" v-slot="scope" auto-save
+                                        @save="(value, initialValue)=>{update(props.row.id, value, props.row.photo)}"
+                                        :disable="!canEdit">
+                                        <q-input type="name" v-model.number="scope.value" dense autofocus
+                                            @keyup.enter="scope.set" />
+                                    </q-popup-edit>
                                 </q-card-section>
                                 <q-separator />
                                 <q-card-section class="flex flex-center">
-                                    <q-img v-bind:src=props.row.photo loading="lazy" spinner-color="white"
-                                        style="max-width: 300px; height: 300px;" :fit="contain" />
+                                    <q-popup-edit v-model.number="props.row.photo" auto-save
+                                        @save="(value, initialValue)=>{update(props.row.id, props.row.name, value)}"
+                                        v-slot="scope" :disable="!canEdit">
+                                        <q-input type="name" v-model.number="scope.value" dense autofocus
+                                            @keyup.enter="scope.set" />
+                                    </q-popup-edit>
+                                    <q-img v-bind:src=props.row.photo loading="lazy" spinner-color="gray"
+                                        style="max-width: 300px; height: 300px;" :fit="contain">
+                                        <template v-slot:error>
+                                            <div class="absolute-full flex flex-center text-white">
+                                                Cannot load image
+                                            </div>
+                                        </template>
+                                    </q-img>
                                 </q-card-section>
                             </q-card>
                         </div>

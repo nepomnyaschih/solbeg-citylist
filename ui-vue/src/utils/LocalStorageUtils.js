@@ -1,8 +1,17 @@
 const JWT_TOKEN_ITEM_KEY = "j_token";
+const USER_ROLES_ITEM_KEY = "u_roles";
 const DEFAULT_EXPIRY_TIME_IN_MS = 60000 * 5; // 60.000 = 60 seconds,
 
 export const getJwtFromStorage = () => {
   return getItem(JWT_TOKEN_ITEM_KEY);
+};
+
+export const getRolesFromStorage = () => {
+  return getItem(USER_ROLES_ITEM_KEY);
+};
+
+export const setRolesInStorage = (roles) => {
+  setItemWithDefaultExpiry(USER_ROLES_ITEM_KEY, roles);
 };
 
 export const setJwtTokenInStorage = (jwtToken) => {
@@ -11,6 +20,10 @@ export const setJwtTokenInStorage = (jwtToken) => {
 
 export const removeJwtTokenFromStorage = () => {
   localStorage.removeItem(JWT_TOKEN_ITEM_KEY);
+};
+
+export const removeRolesFromStorage = () => {
+  localStorage.removeItem(USER_ROLES_ITEM_KEY);
 };
 
 export const getItem = (itemKey) => {

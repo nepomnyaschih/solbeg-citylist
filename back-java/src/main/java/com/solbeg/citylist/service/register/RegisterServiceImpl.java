@@ -40,10 +40,17 @@ public class RegisterServiceImpl implements RegisterService {
         userDTO.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
         UserRoleDTO basicRole = new UserRoleDTO();
-        basicRole.setRole("ROL_BASIC");
+        basicRole.setRole("ROLE_BASIC");
         basicRole.setUserDTO(userDTO);
-
         userDTO.getUserRoles().add(basicRole);
+
+        if (registerRequest.getCanEdit()) {
+            UserRoleDTO editRole = new UserRoleDTO();
+            editRole.setRole("ROLE_ALLOW_EDIT");
+            editRole.setUserDTO(userDTO);
+            userDTO.getUserRoles().add(editRole);
+        }
+
         return userDTO;
     }
 }

@@ -1,5 +1,5 @@
 import { api } from "./api";
-import { removeJwtTokenFromStorage } from "../utils/LocalStorageUtils";
+import { removeJwtTokenFromStorage, removeRolesFromStorage } from "../utils/LocalStorageUtils";
 
 export class LoginService {
   doLogin(loginRequest) {
@@ -8,6 +8,7 @@ export class LoginService {
 
   doLogout() {
     removeJwtTokenFromStorage();
+    removeRolesFromStorage();
   }
 }
 

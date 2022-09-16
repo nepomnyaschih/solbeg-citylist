@@ -15,4 +15,6 @@ public class RegisterRequest {
     @NotBlank(message = "Password can not be empty")
     private String password;
 
+    private Boolean canEdit;
+
 }

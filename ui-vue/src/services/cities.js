@@ -5,7 +5,15 @@ export class CitiesService {
         return api.get("/cities", {
             headers: {
                 Authorization: "Bearer " + citiesRequest.jwt,
-            }, params: {...citiesRequest.searchParams}
+            }, params: { ...citiesRequest.searchParams }
+        });
+    };
+
+    updateCity(jwt, id, cityData) {
+        return api.post("/cities/" + id, cityData, {
+            headers: {
+                Authorization: "Bearer " + jwt,
+            }
         });
     }
 
