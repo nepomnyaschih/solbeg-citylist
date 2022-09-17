@@ -22,7 +22,6 @@ async function loign() {
 </script>
     
 <template>
-
     <q-page class="row justify-center">
         <div class="column">
             <div class="row">
@@ -32,23 +31,19 @@ async function loign() {
                 <q-card square bordered class="q-pa-lg shadow-1">
                     <q-card-section>
                         <q-form class="" @submit="loign">
-                            <q-input
-                                filled
-                                v-model="userName"
-                                label="Login"
-                                lazy-rules
-                                :rules="[ val => val && val.length > 0 || 'required field']"
-                            />
-                            <q-input
-                                filled
-                                type="password"
-                                v-model="userPassword"
-                                label="Password"
-                                lazy-rules
-                                :rules="[ val => val && val.length > 0 || 'required field']"
-                            />
-                            <q-btn label="Login" type="submit" color="primary" class="full-width"/>
+                            <q-input filled v-model="userName" label="Login" lazy-rules
+                                :rules="[ val => val && val.length > 0 || 'required field']" />
+                            <q-input filled type="password" v-model="userPassword" label="Password" lazy-rules
+                                :rules="[ val => val && val.length > 0 || 'required field']" />
+                            <q-btn label="Login" type="submit" color="primary" class="full-width" />
                         </q-form>
+                    </q-card-section>
+                    <q-card-section class="q-pt-none">
+                        Users for test:
+                        <br/>
+                        view - view
+                        <br/>
+                        edit - edit
                     </q-card-section>
                 </q-card>
             </div>
@@ -57,5 +52,6 @@ async function loign() {
 </template>
     
 <style scoped>
+
 </style>
     

@@ -57,7 +57,11 @@ onMounted(() => {
 })
 
 async function update(id, name, photo) {
-    const response = await citiesServise.updateCity($store.getters["loginModule/getJwt"], id, { name, photo });
+    try {
+        return await citiesServise.updateCity($store.getters["loginModule/getJwt"], id, { name, photo });
+    } catch (err) {
+        return false;
+    }
 }
 
 </script>
@@ -84,23 +88,27 @@ async function update(id, name, photo) {
                                 <q-card-section class="text-center">
                                     <strong>{{ props.row.name }}</strong>
                                     <q-icon name="edit" v-if="canEdit" />
-                                    <q-popup-edit v-model.number="props.row.name" v-slot="scope" auto-save
+                                    <q-popup-edit v-model.number="props.row.name" v-slot="scope"
                                         @save="(value, initialValue)=>{update(props.row.id, value, props.row.photo)}"
+                                        :validate="(val)=>{return val.length > 0}"
                                         :disable="!canEdit">
                                         <q-input type="name" v-model.number="scope.value" dense autofocus
-                                            @keyup.enter="scope.set" />
+                                            @keyup.enter="scope.set" 
+                                            :rules="[ val => val && val.length > 0 || 'fill it']"/>
                                     </q-popup-edit>
                                 </q-card-section>
                                 <q-separator />
                                 <q-card-section class="flex flex-center">
                                     <q-popup-edit v-model.number="props.row.photo" auto-save
                                         @save="(value, initialValue)=>{update(props.row.id, props.row.name, value)}"
+                                        :validate="(val)=>{return val.length > 0}"
                                         v-slot="scope" :disable="!canEdit">
                                         <q-input type="name" v-model.number="scope.value" dense autofocus
-                                            @keyup.enter="scope.set" />
+                                            @keyup.enter="scope.set" 
+                                            :rules="[ val => val && val.length > 0 || 'fill it']"/>
                                     </q-popup-edit>
                                     <q-img v-bind:src=props.row.photo loading="lazy" spinner-color="gray"
-                                        style="max-width: 300px; height: 300px;" :fit="contain">
+                                        style="max-width: 300px; height: 300px;">
                                         <template v-slot:error>
                                             <div class="absolute-full flex flex-center text-white">
                                                 Cannot load image
