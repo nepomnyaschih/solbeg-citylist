@@ -1,6 +1,7 @@
 package com.solbeg.citylist.security;
 
 import com.solbeg.citylist.utils.JwtUtil;
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,14 +18,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@AllArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class.getSimpleName());
 
     private final UserDetailsService myUserDetailsService;
-
-    public AuthTokenFilter(UserDetailsService myUserDetailsService) {
-        this.myUserDetailsService = myUserDetailsService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -46,8 +44,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return  request.getServletPath().equals("/api/login") ||
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getServletPath().equals("/api/login") ||
                 request.getServletPath().equals("/api/register");
     }
 

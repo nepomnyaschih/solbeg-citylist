@@ -9,19 +9,41 @@ const $store = useStore();
 const userName = ref('');
 const userPassword = ref('');
 
+const alert = ref(false);
+
 async function loign() {
 
     const name = userName.value;
     const pass = userPassword.value;
 
     const loginRequest = new LoginRequest(name, pass);
-    await $store.dispatch("loginModule/doLogin", loginRequest);
+    try {
+        await $store.dispatch("loginModule/doLogin", loginRequest);
+    } catch (err) {
+        alert.value = true;
+    }
     router.push("/");
 }
 
 </script>
     
 <template>
+    <q-dialog v-model="alert">
+        <q-card>
+            <q-card-section>
+                <div class="text-h6">Error</div>
+            </q-card-section>
+
+            <q-card-section class="q-pt-none">
+                Login or Password is incorrect!
+            </q-card-section>
+
+            <q-card-actions align="right">
+                <q-btn flat label="OK" color="primary" v-close-popup />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
+
     <q-page class="row justify-center">
         <div class="column">
             <div class="row">
@@ -40,9 +62,9 @@ async function loign() {
                     </q-card-section>
                     <q-card-section class="q-pt-none">
                         Users for test:
-                        <br/>
+                        <br />
                         view - view
-                        <br/>
+                        <br />
                         edit - edit
                     </q-card-section>
                 </q-card>

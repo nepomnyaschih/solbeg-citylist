@@ -3,6 +3,7 @@ package com.solbeg.citylist.service.cities;
 import com.solbeg.citylist.mappers.CitiesDtoMapper;
 import com.solbeg.citylist.model.City;
 import com.solbeg.citylist.model.request.CityUpdateRequest;
+import com.solbeg.citylist.model.response.CityUpdateResponse;
 import com.solbeg.citylist.repository.CitiesRepository;
 import lombok.AllArgsConstructor;
 import org.mapstruct.factory.Mappers;
@@ -17,6 +18,8 @@ import org.springframework.util.StringUtils;
 @AllArgsConstructor
 public class CitiesServiceImpl implements CitiesService {
 
+    private static final String UPDATED_MSG = "Success update";
+
     private final CitiesRepository citiesRepository;
     private final CitiesDtoMapper dtoMapper = Mappers.getMapper(CitiesDtoMapper.class);
 
@@ -28,13 +31,16 @@ public class CitiesServiceImpl implements CitiesService {
     }
 
     @Override
-    public boolean updateCity(Long id, CityUpdateRequest updateRequest) {
+    public CityUpdateResponse updateCity(Long id, CityUpdateRequest updateRequest) {
         var cityDTO = citiesRepository.getReferenceById(id);
         if (StringUtils.hasText(updateRequest.getName()))
             cityDTO.setName(updateRequest.getName());
         if (StringUtils.hasText(updateRequest.getPhoto()))
             cityDTO.setPhoto(updateRequest.getPhoto());
         citiesRepository.save(cityDTO);
-        return true;
+        return CityUpdateResponse.builder()
+                .isSuccess(true)
+                .message(UPDATED_MSG)
+                .build();
     }
 }

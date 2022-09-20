@@ -5,6 +5,7 @@ import com.solbeg.citylist.model.request.CityUpdateRequest;
 import com.solbeg.citylist.model.request.LoginRequest;
 import com.solbeg.citylist.model.request.RegisterRequest;
 import com.solbeg.citylist.model.response.CitiesListResponse;
+import com.solbeg.citylist.model.response.CityUpdateResponse;
 import com.solbeg.citylist.model.response.LoginResponse;
 import com.solbeg.citylist.model.response.RegisterResponse;
 import com.solbeg.citylist.repository.CitiesRepository;
@@ -19,14 +20,13 @@ import org.springframework.http.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CitiesTests {
 
-    private static final String BASE_API_URL = "http://localhost:8080/api";
+    private static final String BASE_API_URL = "http://localhost:8181/api";
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -36,38 +36,21 @@ public class CitiesTests {
 
     @BeforeAll
     void setup() {
-        var cityDto1 = new CityDTO();
-        cityDto1.setName("city1");
-        cityDto1.setPhoto("photo1");
-
-        var createdCity1 = citiesRepository.save(cityDto1);
-        assertEquals(cityDto1.getName(), createdCity1.getName());
-        assertEquals(cityDto1.getPhoto(), createdCity1.getPhoto());
-
-        var cityDto2 = new CityDTO();
-        cityDto2.setName("city2");
-        cityDto2.setPhoto("photo2");
-
-        var createdCity2 = citiesRepository.save(cityDto2);
-        assertEquals(cityDto2.getName(), createdCity2.getName());
-        assertEquals(cityDto2.getPhoto(), createdCity2.getPhoto());
-
-        var registerRequestViewer = new RegisterRequest();
-        registerRequestViewer.setUsername("testUserViewer");
-        registerRequestViewer.setPassword("testUserViewer");
-        registerRequestViewer.setCanEdit(false);
+        createCity("city1", "photo1");
+        createCity("city2", "photo2");
 
         var responseRegOkViewer = restTemplate.
-                postForEntity(BASE_API_URL + "/register", registerRequestViewer, RegisterResponse.class);
+                postForEntity(BASE_API_URL + "/register",
+                        new RegisterRequest("testUserViewer", "testUserViewer", false),
+                        RegisterResponse.class
+                );
         assertEquals(responseRegOkViewer.getStatusCode(), HttpStatus.OK);
 
-        var registerRequestEditor = new RegisterRequest();
-        registerRequestEditor.setUsername("testUserEditor");
-        registerRequestEditor.setPassword("testUserEditor");
-        registerRequestEditor.setCanEdit(true);
-
         var responseRegOkEditor = restTemplate.
-                postForEntity(BASE_API_URL + "/register", registerRequestEditor, RegisterResponse.class);
+                postForEntity(BASE_API_URL + "/register",
+                        new RegisterRequest("testUserEditor", "testUserEditor", true),
+                        RegisterResponse.class
+                );
         assertEquals(responseRegOkEditor.getStatusCode(), HttpStatus.OK);
     }
 
@@ -90,8 +73,8 @@ public class CitiesTests {
         assertNotNull(response.getBody());
         var cities = response.getBody().getCities();
         assertEquals(2, cities.size());
-        assertTrue(cities.stream().anyMatch(c->"city1".equals(c.getName())));
-        assertTrue(cities.stream().anyMatch(c->"city2".equals(c.getName())));
+        assertTrue(cities.stream().anyMatch(c -> "city1".equals(c.getName())));
+        assertTrue(cities.stream().anyMatch(c -> "city2".equals(c.getName())));
     }
 
     @Test
@@ -113,7 +96,7 @@ public class CitiesTests {
         assertNotNull(response.getBody());
         var cities = response.getBody().getCities();
         assertEquals(1, cities.size());
-        assertTrue(cities.stream().anyMatch(c->"city1".equals(c.getName())));
+        assertTrue(cities.stream().anyMatch(c -> "city1".equals(c.getName())));
     }
 
     @Test
@@ -135,7 +118,7 @@ public class CitiesTests {
         assertNotNull(response.getBody());
         var cities = response.getBody().getCities();
         assertEquals(1, cities.size());
-        assertTrue(cities.stream().anyMatch(c->"city1".equals(c.getName())));
+        assertTrue(cities.stream().anyMatch(c -> "city1".equals(c.getName())));
 
         ResponseEntity<CitiesListResponse> response1 = restTemplate.exchange(
                 BASE_API_URL + "/cities?page=1&size=1",
@@ -148,27 +131,19 @@ public class CitiesTests {
         assertNotNull(response1.getBody());
         var cities1 = response1.getBody().getCities();
         assertEquals(1, cities1.size());
-        assertTrue(cities1.stream().anyMatch(c->"city2".equals(c.getName())));
+        assertTrue(cities1.stream().anyMatch(c -> "city2".equals(c.getName())));
     }
 
     @Test
-    void editCity() {
-
-        var cityDto = new CityDTO();
-        cityDto.setName("cityForEdit");
-        cityDto.setPhoto("photoForEdit");
-
-        var createdCity1 = citiesRepository.save(cityDto);
-        assertEquals(cityDto.getName(), createdCity1.getName());
-        assertEquals(cityDto.getPhoto(), createdCity1.getPhoto());
-
+    void searchCityByName() {
+        createCity("cityForSearch", "photoForSearch");
         var token = loginAsEditor();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
 
         ResponseEntity<CitiesListResponse> responseList = restTemplate.exchange(
-                BASE_API_URL +"/cities?searchText=cityForEdit",
+                BASE_API_URL + "/cities?searchText=cityForSearch",
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 CitiesListResponse.class
@@ -178,22 +153,30 @@ public class CitiesTests {
         assertNotNull(responseList.getBody());
         var cities = responseList.getBody().getCities();
         assertEquals(1, cities.size());
+    }
 
-        var editRequest = new CityUpdateRequest();
-        editRequest.setName("cityForEditNewName");
-        editRequest.setPhoto("cityForEditNewPhoto");
+    @Test
+    void editCity() {
 
+        var cityForEdit = createCity("cityForEdit", "photoForEdit");
+        var token = loginAsEditor();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        var editRequest = new CityUpdateRequest("cityForEditNewName", "cityForEditNewPhoto");
         var responseUpdate = restTemplate.exchange(
-                BASE_API_URL + "/cities/" + cities.get(0).getId(),
+                BASE_API_URL + "/cities/" + cityForEdit.getId(),
                 HttpMethod.POST,
-                new HttpEntity<>(editRequest,headers),
-                Boolean.class
+                new HttpEntity<>(editRequest, headers),
+                CityUpdateResponse.class
         );
         assertEquals(responseUpdate.getStatusCode(), HttpStatus.OK);
-        assertEquals(Boolean.TRUE, responseUpdate.getBody());
+        assertNotNull(responseUpdate.getBody());
+        assertTrue(responseUpdate.getBody().isSuccess());
 
         ResponseEntity<CitiesListResponse> responseListWithUpdated = restTemplate.exchange(
-                BASE_API_URL +"/cities?searchText=cityForEditNewName",
+                BASE_API_URL + "/cities?searchText=cityForEditNewName",
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 CitiesListResponse.class
@@ -202,35 +185,43 @@ public class CitiesTests {
         assertNotNull(responseListWithUpdated.getBody());
         var citiesWithUpdated = responseListWithUpdated.getBody().getCities();
         assertEquals(1, citiesWithUpdated.size());
+        assertEquals(cityForEdit.getId(), citiesWithUpdated.get(0).getId());
         assertEquals(editRequest.getName(), citiesWithUpdated.get(0).getName());
         assertEquals(editRequest.getPhoto(), citiesWithUpdated.get(0).getPhoto());
     }
 
-    private String loginAsViewer(){
-        var loginRequest = new LoginRequest();
-        loginRequest.setUsername("testUserViewer");
-        loginRequest.setPassword("testUserViewer");
-
+    private String loginAsViewer() {
         var responseLoginOk = restTemplate.
-                postForEntity(BASE_API_URL + "/login", loginRequest, LoginResponse.class);
+                postForEntity(BASE_API_URL + "/login",
+                        new LoginRequest("testUserViewer", "testUserViewer"),
+                        LoginResponse.class
+                );
         assertEquals(responseLoginOk.getStatusCode(), HttpStatus.OK);
         assertNotNull(responseLoginOk.getBody());
         assertNotNull(responseLoginOk.getBody().getJwtToken());
-
         return responseLoginOk.getBody().getJwtToken();
     }
 
-    private String loginAsEditor(){
-        var loginRequest = new LoginRequest();
-        loginRequest.setUsername("testUserEditor");
-        loginRequest.setPassword("testUserEditor");
-
+    private String loginAsEditor() {
         var responseLoginOk = restTemplate.
-                postForEntity(BASE_API_URL + "/login", loginRequest, LoginResponse.class);
+                postForEntity(BASE_API_URL + "/login",
+                        new LoginRequest("testUserEditor","testUserEditor"),
+                        LoginResponse.class
+                );
         assertEquals(responseLoginOk.getStatusCode(), HttpStatus.OK);
         assertNotNull(responseLoginOk.getBody());
         assertNotNull(responseLoginOk.getBody().getJwtToken());
-
         return responseLoginOk.getBody().getJwtToken();
+    }
+
+    private CityDTO createCity(String name, String photo) {
+        var cityDto = new CityDTO();
+        cityDto.setName(name);
+        cityDto.setPhoto(photo);
+
+        var createdCity = citiesRepository.save(cityDto);
+        assertEquals(cityDto.getName(), createdCity.getName());
+        assertEquals(cityDto.getPhoto(), createdCity.getPhoto());
+        return createdCity;
     }
 }

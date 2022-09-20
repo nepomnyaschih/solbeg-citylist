@@ -2,18 +2,17 @@ package com.solbeg.citylist.security;
 
 import com.solbeg.citylist.dto.UserDTO;
 import com.solbeg.citylist.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
+@AllArgsConstructor
 public class MyUserDetailService implements UserDetailsService {
-    private final UserRepository userRepository;
 
-    public MyUserDetailService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

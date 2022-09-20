@@ -1,13 +1,13 @@
 package com.solbeg.citylist.model.response;
 
 import com.solbeg.citylist.model.City;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
+@Builder
 public class CitiesListResponse {
 
     private List<City> cities;

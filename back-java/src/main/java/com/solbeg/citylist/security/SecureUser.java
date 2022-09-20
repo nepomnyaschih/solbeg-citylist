@@ -11,9 +11,9 @@ import java.util.Collection;
 import java.util.List;
 
 public class SecureUser implements UserDetails {
-    private List<SimpleGrantedAuthority> userRoles;
-    private String password;
-    private String username;
+    private final List<SimpleGrantedAuthority> userRoles;
+    private final String password;
+    private final String username;
 
     public SecureUser(UserDTO userDTO) {
         this.userRoles = new ArrayList<>();

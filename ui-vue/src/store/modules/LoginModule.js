@@ -67,7 +67,6 @@ export const loginModule = {
         commit("loginSuccess", {jwt, roles});
         return Promise.resolve();
       } catch (error) {
-        console.log(error);
         commit("loginFailure");
         return Promise.reject(error);
       }

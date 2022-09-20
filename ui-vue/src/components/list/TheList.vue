@@ -68,7 +68,6 @@ async function update(id, name, photo) {
         
 <template>
     <q-page class="row justify-center">
-
         <div class="column full-width">
             <div class="row q-pa-md">
                 <q-table class="full-width" grid title="Cities" :rows="cities" :columns="columns" row-key="name"
@@ -90,22 +89,20 @@ async function update(id, name, photo) {
                                     <q-icon name="edit" v-if="canEdit" />
                                     <q-popup-edit v-model.number="props.row.name" v-slot="scope"
                                         @save="(value, initialValue)=>{update(props.row.id, value, props.row.photo)}"
-                                        :validate="(val)=>{return val.length > 0}"
-                                        :disable="!canEdit">
+                                        :validate="(val)=>{return val.length > 0}" :disable="!canEdit">
                                         <q-input type="name" v-model.number="scope.value" dense autofocus
-                                            @keyup.enter="scope.set" 
-                                            :rules="[ val => val && val.length > 0 || 'fill it']"/>
+                                            @keyup.enter="scope.set"
+                                            :rules="[ val => val && val.length > 0 || 'fill it']" />
                                     </q-popup-edit>
                                 </q-card-section>
                                 <q-separator />
                                 <q-card-section class="flex flex-center">
                                     <q-popup-edit v-model.number="props.row.photo" auto-save
                                         @save="(value, initialValue)=>{update(props.row.id, props.row.name, value)}"
-                                        :validate="(val)=>{return val.length > 0}"
-                                        v-slot="scope" :disable="!canEdit">
+                                        :validate="(val)=>{return val.length > 0}" v-slot="scope" :disable="!canEdit">
                                         <q-input type="name" v-model.number="scope.value" dense autofocus
-                                            @keyup.enter="scope.set" 
-                                            :rules="[ val => val && val.length > 0 || 'fill it']"/>
+                                            @keyup.enter="scope.set"
+                                            :rules="[ val => val && val.length > 0 || 'fill it']" />
                                     </q-popup-edit>
                                     <q-img v-bind:src=props.row.photo loading="lazy" spinner-color="gray"
                                         style="max-width: 300px; height: 300px;">
@@ -122,7 +119,6 @@ async function update(id, name, photo) {
                 </q-table>
             </div>
         </div>
-
     </q-page>
 </template>
         
